@@ -6,7 +6,10 @@
   <header>
     <v-breadcrumbs
         :items="['home','積みリスト']"
-  ></v-breadcrumbs>
+    ></v-breadcrumbs>
+    {{ serverItems }}<br>
+    {{ totalItems }}<br>
+    {{ loading }}<br>
   </header>
 
   <v-data-table-server
@@ -17,57 +20,71 @@
       :loading="loading"
       item-value="name"
       @update:options="loadItems"
-  ></v-data-table-server>
+  >
+    <template #[`item.name`]="{ item }">
+      <router-link :to="`/stock-details/${item.id}`">{{ item.name }}</router-link>
+    </template>
+  </v-data-table-server>
 </template>
 
 <script>
 const desserts = [
   {
+    id: 1,
     name: 'Frozen Yogurt',
     purchase_date: '2024/06/17',
     elapsed_days: 6.0,
   },
   {
+    id: 2,
     name: 'Jelly bean',
     purchase_date: '2024/06/16',
     elapsed_days: 0.0,
   },
   {
+    id: 3,
     name: 'KitKat',
     purchase_date: '2024/06/17',
     elapsed_days: 26.0,
   },
   {
+    id: 4,
     name: 'Eclair',
     purchase_date: '2024/06/17',
     elapsed_days: 16.0,
   },
   {
+    id: 5,
     name: 'Gingerbread',
     purchase_date: '2024/06/17',
     elapsed_days: 16.0,
   },
   {
+    id: 6,
     name: 'Ice cream sandwich',
     purchase_date: '2024/06/17',
     elapsed_days: 9.0,
   },
   {
+    id: 7,
     name: 'Lollipop',
     purchase_date: '2024/06/17',
     elapsed_days: 0.2,
   },
   {
+    id: 8,
     name: 'Cupcake',
     purchase_date: '2024/06/17',
     elapsed_days: 3.7,
   },
   {
+    id: 9,
     name: 'Honeycomb',
     purchase_date: '2024/06/17',
     elapsed_days: 3.2,
   },
   {
+    id: 10,
     name: 'Donut',
     purchase_date: '2024/06/17',
     elapsed_days: 25.0,
