@@ -11,6 +11,10 @@ const onSubmit = () => {
 <template>
   <main>
     <v-btn @click="onSubmit">実行</v-btn>
-    <TheWelcome/>
+    <h3>左から選んでね</h3>
   </main>
 </template>
+
+<script>
+
+</script>
