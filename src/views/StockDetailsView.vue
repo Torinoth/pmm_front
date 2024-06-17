@@ -12,11 +12,16 @@
   <main>
     <v-container>
       <v-row>
-        <h1>{{ details.name }}</h1>
-        <p>Purchase Date: {{ details.purchase_date }}</p>
-        <p>Maker: {{ details.maker }}</p>
-        <p>Brand: {{ details.brand }}</p>
-        <p>Price: {{ details.price }}</p>
+        <v-col cols="6">
+          <img src="" alt="なにか">
+        </v-col>
+        <v-col cols="6">
+          <p>name: {{ details.name }}</p>
+          <p>Purchase Date: {{ details.purchase_date }}</p>
+          <p>Maker: {{ details.maker }}</p>
+          <p>Brand: {{ details.brand }}</p>
+          <p>Price: {{ details.price }}</p>
+        </v-col>
       </v-row>
     </v-container>
   </main>
