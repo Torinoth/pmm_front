@@ -2,11 +2,11 @@
   <div class="about">
 
 
-    <div v-for="post in posts" :key="post.id">
-      {{ post.purchase_date }}
+<!--    <div v-for="post in posts" :key="post.id">-->
+<!--      {{ post.purchase_date }}-->
 
 
-    </div>
+<!--    </div>-->
   </div>
 </template>
 
@@ -23,12 +23,12 @@
 <script>
 import axios from 'axios';
 
-import {useStore} from "pinia";
+// import {useStore} from "pinia";
 import {pmmApiStore} from "@/stores/pmm_store.js";
 
 export default {
-  setup(){
-  const store = useStore(pmmApiStore);
+  setup() {
+    // const store = useStore(pmmApiStore);
   },
 
   data() {
@@ -41,7 +41,8 @@ export default {
   },
   methods: {
     async getPosts() {
-      const response = await axios.get('http://127.0.0.1:8000/api/products/?format=json')
+      // const response = await axios.get('http://127.0.0.1:8000/api/products/?format=json')
+      const response = {}
       this.posts = response.data
     }
   },

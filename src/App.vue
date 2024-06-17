@@ -10,7 +10,7 @@ import HelloWorld from './components/HelloWorld.vue'
         <v-app-bar-nav-icon></v-app-bar-nav-icon>
       </template>
 
-      <v-app-bar-title>Application Bar</v-app-bar-title>
+      <v-app-bar-title>すこん部員のなにがし</v-app-bar-title>
 
       <template v-slot:append>
         <v-btn icon="mdi-heart"></v-btn>
@@ -22,18 +22,19 @@ import HelloWorld from './components/HelloWorld.vue'
     </v-app-bar>
     <v-navigation-drawer>
       <v-list>
-        <v-list-item title="Navi"></v-list-item>
+        <v-list-item title="menu"></v-list-item>
         <v-list-item>
           <RouterLink to="/">Home</RouterLink>
         </v-list-item>
         <v-list-item>
-          <RouterLink to="/about">about</RouterLink>
+          <RouterLink to="/stock-list">積み状況</RouterLink>
         </v-list-item>
 
       </v-list>
     </v-navigation-drawer>
 
     <v-main>
+
       <RouterView/>
     </v-main>
   </v-layout>
