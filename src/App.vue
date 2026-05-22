@@ -1,45 +1,40 @@
 <script setup>
-import {RouterLink, RouterView} from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import {ref} from 'vue'
+import {RouterView} from 'vue-router'
+
+const drawer = ref(true)
 </script>
 
 <template>
   <v-layout class="rounded rounded-md">
     <v-app-bar :elevation="2">
       <template v-slot:prepend>
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon @click="drawer = !drawer"/>
       </template>
 
       <v-app-bar-title>すこん部員のなにがし</v-app-bar-title>
-
-      <template v-slot:append>
-        <v-btn icon="mdi-heart"></v-btn>
-
-        <v-btn icon="mdi-magnify"></v-btn>
-
-        <v-btn icon="mdi-dots-vertical"></v-btn>
-      </template>
     </v-app-bar>
-    <v-navigation-drawer>
-      <v-list>
-        <v-list-item title="menu"></v-list-item>
-        <v-list-item>
-          <RouterLink to="/">Home</RouterLink>
-        </v-list-item>
-        <v-list-item>
-          <RouterLink to="/stock-list">積み状況</RouterLink>
-        </v-list-item>
 
+    <v-navigation-drawer v-model="drawer">
+      <v-list nav>
+        <v-list-item
+            prepend-icon="mdi-home"
+            title="Home"
+            :to="{ name: 'home' }"
+        />
+        <v-list-item
+            prepend-icon="mdi-format-list-bulleted"
+            title="積み状況"
+            :to="{ name: 'stock_list' }"
+        />
       </v-list>
     </v-navigation-drawer>
 
     <v-main>
-
       <RouterView/>
     </v-main>
   </v-layout>
 </template>
 
 <style scoped>
-
 </style>
