@@ -59,9 +59,24 @@
     </template>
     <template #[`item.actions`]="{ item }">
       <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditDialog(item)"/>
-      <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="deleteKit(item)"/>
+      <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog(item)"/>
     </template>
   </v-data-table-server>
+
+  <!-- 削除確認ダイアログ -->
+  <v-dialog v-model="deleteDialog" max-width="400">
+    <v-card>
+      <v-card-title>削除の確認</v-card-title>
+      <v-card-text>
+        「{{ kitToDelete?.name }}」を削除しますか？この操作は取り消せません。
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer/>
+        <v-btn text @click="deleteDialog = false">キャンセル</v-btn>
+        <v-btn color="error" @click="confirmDeleteKit">削除</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 
   <!-- 登録・編集ダイアログ -->
   <v-dialog v-model="dialog" max-width="600" persistent>
@@ -106,7 +121,7 @@
               v-model="editedKit.price"
               label="価格（円）"
               type="number"
-              :rules="[v => !!v || '必須項目です']"
+              :rules="[v => (v !== null && v !== '') || '必須項目です']"
               required
           />
           <tag-input v-model="editedKit.tag_ids"/>
@@ -151,6 +166,9 @@ export default {
     editedKit: {id: null, name: '', maker: null, brand: null, scale: null, price: '', tag_ids: []},
     defaultKit: {id: null, name: '', maker: null, brand: null, scale: null, price: '', tag_ids: []},
 
+    deleteDialog: false,
+    kitToDelete: null,
+
     makers: [],
     brands: [],
     scales: [],
@@ -168,10 +186,7 @@ export default {
       try {
         const params = {page: options.page, page_size: options.itemsPerPage}
         if (this.selectedTagIds.length) {
-          const tagNames = this.availableTags
-              .filter(t => this.selectedTagIds.includes(t.id))
-              .map(t => t.name)
-          params.tags = tagNames.join(',')
+          params.tags = this.selectedTagIds.join(',')
         }
         const res = await kitsApi.list(params)
         this.serverItems = res.data.results ?? res.data
@@ -184,19 +199,27 @@ export default {
     },
 
     async loadTags() {
-      const res = await tagsApi.list()
-      this.availableTags = res.data.results ?? res.data
+      try {
+        const res = await tagsApi.list()
+        this.availableTags = res.data.results ?? res.data
+      } catch {
+        toaster.error('タグの取得に失敗しました')
+      }
     },
 
     async loadMasters() {
-      const [mkRes, brRes, scRes] = await Promise.all([
-        makersApi.list(),
-        brandsApi.list(),
-        scalesApi.list(),
-      ])
-      this.makers = mkRes.data.results ?? mkRes.data
-      this.brands = brRes.data.results ?? brRes.data
-      this.scales = scRes.data.results ?? scRes.data
+      try {
+        const [mkRes, brRes, scRes] = await Promise.all([
+          makersApi.list(),
+          brandsApi.list(),
+          scalesApi.list(),
+        ])
+        this.makers = mkRes.data.results ?? mkRes.data
+        this.brands = brRes.data.results ?? brRes.data
+        this.scales = scRes.data.results ?? scRes.data
+      } catch {
+        toaster.error('マスターデータの取得に失敗しました')
+      }
     },
 
     onTagFilterChange() {
@@ -204,7 +227,7 @@ export default {
     },
 
     openCreateDialog() {
-      this.editedKit = {...this.defaultKit}
+      this.editedKit = {...this.defaultKit, tag_ids: []}
       this.dialog = true
     },
 
@@ -242,14 +265,21 @@ export default {
       }
     },
 
-    async deleteKit(kit) {
-      if (!confirm(`「${kit.name}」を削除しますか？`)) return
+    openDeleteDialog(kit) {
+      this.kitToDelete = kit
+      this.deleteDialog = true
+    },
+
+    async confirmDeleteKit() {
+      this.deleteDialog = false
       try {
-        await kitsApi.destroy(kit.id)
+        await kitsApi.destroy(this.kitToDelete.id)
         toaster.success('キットを削除しました')
         this.loadItems(this.currentOptions)
-      } catch (e) {
+      } catch {
         toaster.error('削除に失敗しました')
+      } finally {
+        this.kitToDelete = null
       }
     },
   },

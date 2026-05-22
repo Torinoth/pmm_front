@@ -16,17 +16,20 @@
       <v-row>
         <v-col cols="12" md="6">
           <v-img
-              :src="details.image || ''"
+              v-if="details.image"
+              :src="details.image"
+              :alt="details.name"
               height="300"
               cover
               class="bg-grey-lighten-3 rounded"
+          />
+          <div
+              v-else
+              class="bg-grey-lighten-3 rounded d-flex align-center justify-center"
+              style="height:300px"
           >
-            <template #placeholder>
-              <v-row align="center" justify="center" class="fill-height">
-                <v-icon size="64" color="grey">mdi-image-off</v-icon>
-              </v-row>
-            </template>
-          </v-img>
+            <v-icon size="64" color="grey">mdi-image-off</v-icon>
+          </div>
         </v-col>
 
         <v-col cols="12" md="6">
@@ -60,7 +63,7 @@
                     <v-icon>mdi-currency-jpy</v-icon>
                   </template>
                   <v-list-item-title>価格</v-list-item-title>
-                  <v-list-item-subtitle>¥{{ details.price }}</v-list-item-subtitle>
+                  <v-list-item-subtitle>¥{{ formattedPrice }}</v-list-item-subtitle>
                 </v-list-item>
               </v-list>
 
@@ -87,7 +90,7 @@
               </div>
             </v-card-text>
             <v-card-actions>
-              <v-btn prepend-icon="mdi-arrow-left" variant="text" @click="$router.back()">
+              <v-btn prepend-icon="mdi-arrow-left" variant="text" @click="$router.push({ name: 'stock_list' })">
                 一覧に戻る
               </v-btn>
             </v-card-actions>
@@ -118,6 +121,13 @@ export default {
 
   created() {
     this.fetchKit()
+  },
+
+  computed: {
+    formattedPrice() {
+      if (this.details?.price == null) return ''
+      return Number(this.details.price).toLocaleString('ja-JP')
+    },
   },
 
   methods: {
