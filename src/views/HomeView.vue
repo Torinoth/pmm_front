@@ -1,6 +1,4 @@
 <script setup>
-import TheWelcome from '../components/TheWelcome.vue'
-
 import toaster from '@/plugins/Toaster'
 
 const onSubmit = () => {
@@ -14,7 +12,3 @@ const onSubmit = () => {
     <h3>左から選んでね</h3>
   </main>
 </template>
-
-<script>
-
-</script>

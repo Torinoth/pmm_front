@@ -1,13 +1,5 @@
 <template>
-  <div class="about">
-
-
-<!--    <div v-for="post in posts" :key="post.id">-->
-<!--      {{ post.purchase_date }}-->
-
-
-<!--    </div>-->
-  </div>
+  <div class="about"></div>
 </template>
 
 <style>
@@ -19,34 +11,3 @@
   }
 }
 </style>
-
-<script>
-import axios from 'axios';
-
-// import {useStore} from "pinia";
-import {pmmApiStore} from "@/stores/pmm_store.js";
-
-export default {
-  setup() {
-    // const store = useStore(pmmApiStore);
-  },
-
-  data() {
-    return {
-      posts: []
-    }
-  },
-  created() {
-    this.getPosts()
-  },
-  methods: {
-    async getPosts() {
-      // const response = await axios.get('http://127.0.0.1:8000/api/products/?format=json')
-      const response = {}
-      this.posts = response.data
-    }
-  },
-  computed: {}
-}
-
-</script>

@@ -91,15 +91,6 @@
               required
           />
           <v-select
-              v-model="editedKit.maker"
-              :items="makers"
-              item-title="name"
-              item-value="id"
-              label="メーカー"
-              :rules="[v => !!v || '必須項目です']"
-              required
-          />
-          <v-select
               v-model="editedKit.brand"
               :items="brands"
               item-title="name"
@@ -137,7 +128,7 @@
 </template>
 
 <script>
-import {kitsApi, tagsApi, makersApi, brandsApi, scalesApi} from '@/api/index.js'
+import {kitsApi, tagsApi, brandsApi, scalesApi} from '@/api/index.js'
 import TagInput from '@/components/TagInput.vue'
 import toaster from '@/plugins/Toaster.js'
 
@@ -163,13 +154,12 @@ export default {
 
     dialog: false,
     saving: false,
-    editedKit: {id: null, name: '', maker: null, brand: null, scale: null, price: '', tag_ids: []},
-    defaultKit: {id: null, name: '', maker: null, brand: null, scale: null, price: '', tag_ids: []},
+    editedKit: {id: null, name: '', brand: null, scale: null, price: '', tag_ids: []},
+    defaultKit: {id: null, name: '', brand: null, scale: null, price: '', tag_ids: []},
 
     deleteDialog: false,
     kitToDelete: null,
 
-    makers: [],
     brands: [],
     scales: [],
   }),
@@ -209,12 +199,10 @@ export default {
 
     async loadMasters() {
       try {
-        const [mkRes, brRes, scRes] = await Promise.all([
-          makersApi.list(),
+        const [brRes, scRes] = await Promise.all([
           brandsApi.list(),
           scalesApi.list(),
         ])
-        this.makers = mkRes.data.results ?? mkRes.data
         this.brands = brRes.data.results ?? brRes.data
         this.scales = scRes.data.results ?? scRes.data
       } catch {
@@ -235,7 +223,6 @@ export default {
       this.editedKit = {
         id: kit.id,
         name: kit.name,
-        maker: kit.maker,
         brand: kit.brand,
         scale: kit.scale,
         price: kit.price,
