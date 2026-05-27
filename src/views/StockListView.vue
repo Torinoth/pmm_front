@@ -84,6 +84,16 @@
         {{ tag.name }}
       </v-chip>
     </template>
+    <template #[`item.status`]="{ item }">
+      <v-chip
+          v-if="item.status"
+          size="x-small"
+          :color="statusColorMap[item.status]"
+          variant="tonal"
+      >
+        {{ statusLabelMap[item.status] }}
+      </v-chip>
+    </template>
     <template v-if="authStore.isAuthenticated" #[`item.actions`]="{ item }">
       <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditDialog(item)"/>
       <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog(item)"/>
@@ -132,6 +142,7 @@ export default {
         {title: 'スケール', key: 'scale_size', align: 'start', sortable: false},
         {title: '価格', key: 'price', align: 'end', sortable: false},
         {title: 'タグ', key: 'tags', align: 'start', sortable: false},
+        {title: 'ステータス', key: 'status', align: 'start', sortable: false},
       ]
       if (this.authStore.isAuthenticated) {
         base.push({title: '', key: 'actions', align: 'end', sortable: false})
@@ -158,6 +169,14 @@ export default {
       {value: 'sold',        label: '売却済み', color: 'blue'},
       {value: 'parted_out',  label: '素材化',   color: 'deep-purple'},
     ],
+    statusLabelMap: {
+      backlog: '積み', in_progress: '製作中', completed: '完成',
+      on_hold: '中断', sold: '売却済み', parted_out: '素材化',
+    },
+    statusColorMap: {
+      backlog: 'orange', in_progress: 'green', completed: 'teal',
+      on_hold: 'grey', sold: 'blue', parted_out: 'deep-purple',
+    },
 
     editDialog: false,
     kitToEdit: null,
@@ -168,6 +187,14 @@ export default {
 
   created() {
     this.loadTags()
+    const status = this.$route.query.status
+    if (status) {
+      this.selectedStatus = status
+    }
+    const tagId = this.$route.query.tag_id
+    if (tagId) {
+      this.selectedTagIds = [Number(tagId)]
+    }
   },
 
   methods: {

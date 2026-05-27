@@ -44,6 +44,17 @@
           />
           <tag-input v-model="form.tag_ids"/>
 
+          <v-select
+              v-model="form.status"
+              :items="statusOptions"
+              item-title="label"
+              item-value="value"
+              label="ステータス"
+              :rules="[v => !!v || '必須項目です']"
+              required
+              class="mt-2"
+          />
+
           <v-file-input
               v-model="form.imageFile"
               label="キット画像"
@@ -85,6 +96,7 @@ const emptyForm = () => ({
   scale: null,
   price: '',
   tag_ids: [],
+  status: 'backlog',
   imageFile: null,
   currentImageUrl: '',
 })
@@ -113,6 +125,14 @@ export default {
     scales: [],
     mastersLoading: false,
     saving: false,
+    statusOptions: [
+      {value: 'backlog',     label: '積み'},
+      {value: 'in_progress', label: '製作中'},
+      {value: 'completed',   label: '完成'},
+      {value: 'on_hold',     label: '中断'},
+      {value: 'sold',        label: '売却済み'},
+      {value: 'parted_out',  label: '素材化'},
+    ],
   }),
 
   watch: {
@@ -134,6 +154,7 @@ export default {
           scale: this.kit.scale,
           price: this.kit.price,
           tag_ids: (this.kit.tags ?? []).map(t => t.id),
+          status: this.kit.status ?? 'backlog',
           imageFile: null,
           currentImageUrl: this.kit.image || '',
         }
@@ -172,6 +193,7 @@ export default {
         formData.append('brand', this.form.brand)
         formData.append('scale', this.form.scale)
         formData.append('price', this.form.price)
+        formData.append('status', this.form.status)
         if (this.form.imageFile instanceof File) {
           formData.append('image', this.form.imageFile)
         }

@@ -28,7 +28,7 @@
             variant="tonal"
             class="text-center pa-2"
             style="cursor: pointer"
-            @click="$router.push({ name: 'stock_list' })"
+            @click="$router.push({ name: 'stock_list', query: card.status ? {status: card.status} : {} })"
         >
           <v-card-text>
             <v-icon :icon="card.icon" size="40" class="mb-3"/>
@@ -58,7 +58,7 @@
               size="large"
               class="mr-2 mb-2"
               style="cursor: pointer"
-              @click="$router.push({ name: 'stock_list' })"
+              @click="$router.push({ name: 'stock_list', query: { tag_id: tag.id } })"
           >
             {{ tag.name }}
             <template #append>
@@ -87,10 +87,10 @@ export default {
     loading: true,
     summary: {},
     summaryCards: [
-      {key: 'total_kits',  label: '総キット数', icon: 'mdi-package-variant-closed', color: 'blue-grey'},
-      {key: 'backlog',     label: '積みプラ',   icon: 'mdi-layers-plus',            color: 'orange'},
-      {key: 'in_progress', label: '製作中',     icon: 'mdi-hammer-wrench',          color: 'green'},
-      {key: 'completed',   label: '完成',       icon: 'mdi-check-decagram',         color: 'teal'},
+      {key: 'total_kits',  label: '総キット数', icon: 'mdi-package-variant-closed', color: 'blue-grey', status: null},
+      {key: 'backlog',     label: '積みプラ',   icon: 'mdi-layers-plus',            color: 'orange',    status: 'backlog'},
+      {key: 'in_progress', label: '製作中',     icon: 'mdi-hammer-wrench',          color: 'green',     status: 'in_progress'},
+      {key: 'completed',   label: '完成',       icon: 'mdi-check-decagram',         color: 'teal',      status: 'completed'},
     ],
   }),
 
