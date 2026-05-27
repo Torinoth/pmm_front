@@ -1,6 +1,10 @@
 <template>
   <header>
-    <v-breadcrumbs :items="['home', '積みリスト', details.name || '...']"/>
+    <v-breadcrumbs :items="[
+        {title: 'home', to: {name: 'home'}},
+        {title: '積みリスト', to: {name: 'stock_list'}},
+        {title: details?.name || '...', disabled: true},
+    ]"/>
   </header>
 
   <main>
@@ -93,6 +97,15 @@
               <v-btn prepend-icon="mdi-arrow-left" variant="text" @click="$router.push({ name: 'stock_list' })">
                 一覧に戻る
               </v-btn>
+              <v-btn
+                  v-if="authStore.isAuthenticated"
+                  prepend-icon="mdi-pencil"
+                  color="primary"
+                  variant="tonal"
+                  @click="editDialog = true"
+              >
+                編集
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -103,31 +116,44 @@
       <v-alert type="error">キットが見つかりませんでした。</v-alert>
     </v-container>
   </main>
+
+  <kit-edit-dialog
+      v-model="editDialog"
+      :kit="details"
+      @saved="fetchKit"
+  />
 </template>
 
 <script>
+import {mapStores} from 'pinia'
+import {useAuthStore} from '@/stores/auth.js'
 import {kitsApi} from '@/api/index.js'
+import KitEditDialog from '@/components/KitEditDialog.vue'
 import toaster from '@/plugins/Toaster.js'
 
 export default {
+  components: {KitEditDialog},
+
   props: {
     id: {type: [String, Number], required: true},
+  },
+
+  computed: {
+    ...mapStores(useAuthStore),
+    formattedPrice() {
+      if (this.details?.price == null) return ''
+      return Number(this.details.price).toLocaleString('ja-JP')
+    },
   },
 
   data: () => ({
     details: null,
     loading: true,
+    editDialog: false,
   }),
 
   created() {
     this.fetchKit()
-  },
-
-  computed: {
-    formattedPrice() {
-      if (this.details?.price == null) return ''
-      return Number(this.details.price).toLocaleString('ja-JP')
-    },
   },
 
   methods: {

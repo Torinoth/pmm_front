@@ -4,7 +4,10 @@ import AboutView from '@/views/AboutView.vue'
 import StockListView from '@/views/StockListView.vue'
 import StockDetailsView from '@/views/StockDetailsView.vue'
 import LoginView from '@/views/LoginView.vue'
-import {authApi} from '@/api/index.js'
+import MasterView from '@/views/MasterView.vue'
+import RegisterView from '@/views/RegisterView.vue'
+import AdminUsersView from '@/views/AdminUsersView.vue'
+import {useAuthStore} from '@/stores/auth.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,7 +16,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView,
-      meta: {public: true},
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: RegisterView,
     },
     {
       path: '/',
@@ -36,17 +43,32 @@ const router = createRouter({
       component: StockDetailsView,
       props: true,
     },
+    {
+      path: '/master',
+      name: 'master',
+      component: MasterView,
+      meta: {requiresAuth: true},
+    },
+    {
+      path: '/admin/users',
+      name: 'admin_users',
+      component: AdminUsersView,
+      meta: {requiresAuth: true, requiresStaff: true},
+    },
   ],
 })
 
 router.beforeEach(async (to) => {
-  if (to.meta.public) return true
-  try {
-    await authApi.me()
-    return true
-  } catch {
+  const auth = useAuthStore()
+  await auth.fetchMe()
+
+  if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return {name: 'login'}
   }
+  if (to.meta.requiresStaff && !auth.isStaff) {
+    return {name: 'home'}
+  }
+  return true
 })
 
 export default router

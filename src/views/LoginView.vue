@@ -29,6 +29,12 @@
               </v-btn>
             </v-form>
           </v-card-text>
+          <v-card-actions class="px-4 pb-4">
+            <span class="text-body-2 text-medium-emphasis">アカウントをお持ちでない方は</span>
+            <v-btn variant="text" size="small" :to="{name: 'register'}" class="ml-1 px-1">
+              新規登録
+            </v-btn>
+          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>

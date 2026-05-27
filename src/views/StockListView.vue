@@ -1,16 +1,19 @@
 <template>
   <header>
-    <v-breadcrumbs :items="['home', '積みリスト']"/>
+    <v-breadcrumbs :items="[
+        {title: 'home', to: {name: 'home'}},
+        {title: '積みリスト', disabled: true},
+    ]"/>
   </header>
 
-  <!-- タグフィルター -->
+  <!-- フィルター -->
   <v-container fluid class="pb-0">
     <v-row align="center">
       <v-col cols="auto">
-        <span class="text-body-2 text-medium-emphasis">タグで絞り込み：</span>
+        <span class="text-body-2 text-medium-emphasis">タグ：</span>
       </v-col>
       <v-col>
-        <v-chip-group v-model="selectedTagIds" multiple @update:model-value="onTagFilterChange">
+        <v-chip-group v-model="selectedTagIds" multiple @update:model-value="onFilterChange">
           <v-chip
               v-for="tag in availableTags"
               :key="tag.id"
@@ -24,10 +27,30 @@
           </v-chip>
         </v-chip-group>
       </v-col>
-      <v-col cols="auto">
+      <v-col v-if="authStore.isAuthenticated" cols="auto">
         <v-btn color="primary" prepend-icon="mdi-plus" @click="openCreateDialog">
           キット登録
         </v-btn>
+      </v-col>
+    </v-row>
+    <v-row align="center" class="mt-n2">
+      <v-col cols="auto">
+        <span class="text-body-2 text-medium-emphasis">ステータス：</span>
+      </v-col>
+      <v-col>
+        <v-chip-group v-model="selectedStatus" @update:model-value="onFilterChange">
+          <v-chip
+              v-for="s in statusOptions"
+              :key="s.value"
+              :value="s.value"
+              filter
+              variant="outlined"
+              :color="s.color"
+              size="small"
+          >
+            {{ s.label }}
+          </v-chip>
+        </v-chip-group>
       </v-col>
     </v-row>
   </v-container>
@@ -35,7 +58,7 @@
   <!-- データテーブル -->
   <v-data-table-server
       v-model:items-per-page="itemsPerPage"
-      :headers="headers"
+      :headers="tableHeaders"
       :items="serverItems"
       :items-length="totalItems"
       :loading="loading"
@@ -44,6 +67,10 @@
   >
     <template #[`item.name`]="{ item }">
       <router-link :to="`/stock-details/${item.id}`">{{ item.name }}</router-link>
+    </template>
+    <template #[`item.image`]="{ item }">
+      <v-icon v-if="item.image" color="primary" size="small" title="画像あり">mdi-image</v-icon>
+      <v-icon v-else color="grey-lighten-2" size="small" title="画像なし">mdi-image-off</v-icon>
     </template>
     <template #[`item.tags`]="{ item }">
       <v-chip
@@ -57,7 +84,7 @@
         {{ tag.name }}
       </v-chip>
     </template>
-    <template #[`item.actions`]="{ item }">
+    <template v-if="authStore.isAuthenticated" #[`item.actions`]="{ item }">
       <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditDialog(item)"/>
       <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog(item)"/>
     </template>
@@ -72,78 +99,49 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer/>
-        <v-btn text @click="deleteDialog = false">キャンセル</v-btn>
+        <v-btn variant="text" @click="deleteDialog = false">キャンセル</v-btn>
         <v-btn color="error" @click="confirmDeleteKit">削除</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 
-  <!-- 登録・編集ダイアログ -->
-  <v-dialog v-model="dialog" max-width="600" persistent>
-    <v-card>
-      <v-card-title>{{ editedKit.id ? 'キット編集' : 'キット登録' }}</v-card-title>
-      <v-card-text>
-        <v-form ref="formRef">
-          <v-text-field
-              v-model="editedKit.name"
-              label="キット名"
-              :rules="[v => !!v || '必須項目です']"
-              required
-          />
-          <v-select
-              v-model="editedKit.brand"
-              :items="brands"
-              item-title="name"
-              item-value="id"
-              label="ブランド"
-              :rules="[v => !!v || '必須項目です']"
-              required
-          />
-          <v-select
-              v-model="editedKit.scale"
-              :items="scales"
-              item-title="size"
-              item-value="id"
-              label="スケール"
-              :rules="[v => !!v || '必須項目です']"
-              required
-          />
-          <v-text-field
-              v-model="editedKit.price"
-              label="価格（円）"
-              type="number"
-              :rules="[v => (v !== null && v !== '') || '必須項目です']"
-              required
-          />
-          <tag-input v-model="editedKit.tag_ids"/>
-        </v-form>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer/>
-        <v-btn text @click="dialog = false">キャンセル</v-btn>
-        <v-btn color="primary" :loading="saving" @click="saveKit">保存</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  <!-- 登録・編集ダイアログ（共通コンポーネント） -->
+  <kit-edit-dialog
+      v-model="editDialog"
+      :kit="kitToEdit"
+      @saved="loadItems(currentOptions)"
+  />
 </template>
 
 <script>
-import {kitsApi, tagsApi, brandsApi, scalesApi} from '@/api/index.js'
-import TagInput from '@/components/TagInput.vue'
+import {mapStores} from 'pinia'
+import {useAuthStore} from '@/stores/auth.js'
+import {kitsApi, tagsApi} from '@/api/index.js'
+import KitEditDialog from '@/components/KitEditDialog.vue'
 import toaster from '@/plugins/Toaster.js'
 
 export default {
-  components: {TagInput},
+  components: {KitEditDialog},
+
+  computed: {
+    ...mapStores(useAuthStore),
+    tableHeaders() {
+      const base = [
+        {title: 'キット名', align: 'start', sortable: false, key: 'name'},
+        {title: '画像', key: 'image', align: 'center', sortable: false, width: '60px'},
+        {title: 'スケール', key: 'scale_size', align: 'start', sortable: false},
+        {title: '価格', key: 'price', align: 'end', sortable: false},
+        {title: 'タグ', key: 'tags', align: 'start', sortable: false},
+      ]
+      if (this.authStore.isAuthenticated) {
+        base.push({title: '', key: 'actions', align: 'end', sortable: false})
+      }
+      return base
+    },
+  },
 
   data: () => ({
     itemsPerPage: 10,
-    headers: [
-      {title: 'キット名', align: 'start', sortable: false, key: 'name'},
-      {title: 'スケール', key: 'scale_size', align: 'start', sortable: false},
-      {title: '価格', key: 'price', align: 'end', sortable: false},
-      {title: 'タグ', key: 'tags', align: 'start', sortable: false},
-      {title: '', key: 'actions', align: 'end', sortable: false},
-    ],
     serverItems: [],
     loading: true,
     totalItems: 0,
@@ -151,22 +149,25 @@ export default {
 
     availableTags: [],
     selectedTagIds: [],
+    selectedStatus: null,
+    statusOptions: [
+      {value: 'backlog',     label: '積み',     color: 'orange'},
+      {value: 'in_progress', label: '製作中',   color: 'green'},
+      {value: 'completed',   label: '完成',     color: 'teal'},
+      {value: 'on_hold',     label: '中断',     color: 'grey'},
+      {value: 'sold',        label: '売却済み', color: 'blue'},
+      {value: 'parted_out',  label: '素材化',   color: 'deep-purple'},
+    ],
 
-    dialog: false,
-    saving: false,
-    editedKit: {id: null, name: '', brand: null, scale: null, price: '', tag_ids: []},
-    defaultKit: {id: null, name: '', brand: null, scale: null, price: '', tag_ids: []},
+    editDialog: false,
+    kitToEdit: null,
 
     deleteDialog: false,
     kitToDelete: null,
-
-    brands: [],
-    scales: [],
   }),
 
   created() {
     this.loadTags()
-    this.loadMasters()
   },
 
   methods: {
@@ -178,10 +179,13 @@ export default {
         if (this.selectedTagIds.length) {
           params.tags = this.selectedTagIds.join(',')
         }
+        if (this.selectedStatus) {
+          params.status = this.selectedStatus
+        }
         const res = await kitsApi.list(params)
         this.serverItems = res.data.results ?? res.data
         this.totalItems = res.data.count ?? res.data.length
-      } catch (e) {
+      } catch {
         toaster.error('データの取得に失敗しました')
       } finally {
         this.loading = false
@@ -197,59 +201,18 @@ export default {
       }
     },
 
-    async loadMasters() {
-      try {
-        const [brRes, scRes] = await Promise.all([
-          brandsApi.list(),
-          scalesApi.list(),
-        ])
-        this.brands = brRes.data.results ?? brRes.data
-        this.scales = scRes.data.results ?? scRes.data
-      } catch {
-        toaster.error('マスターデータの取得に失敗しました')
-      }
-    },
-
-    onTagFilterChange() {
+    onFilterChange() {
       this.loadItems({...this.currentOptions, page: 1})
     },
 
     openCreateDialog() {
-      this.editedKit = {...this.defaultKit, tag_ids: []}
-      this.dialog = true
+      this.kitToEdit = null
+      this.editDialog = true
     },
 
     openEditDialog(kit) {
-      this.editedKit = {
-        id: kit.id,
-        name: kit.name,
-        brand: kit.brand,
-        scale: kit.scale,
-        price: kit.price,
-        tag_ids: kit.tags.map(t => t.id),
-      }
-      this.dialog = true
-    },
-
-    async saveKit() {
-      const valid = await this.$refs.formRef?.validate()
-      if (!valid?.valid) return
-      this.saving = true
-      try {
-        if (this.editedKit.id) {
-          await kitsApi.update(this.editedKit.id, this.editedKit)
-          toaster.success('キットを更新しました')
-        } else {
-          await kitsApi.create(this.editedKit)
-          toaster.success('キットを登録しました')
-        }
-        this.dialog = false
-        this.loadItems(this.currentOptions)
-      } catch (e) {
-        toaster.error('保存に失敗しました')
-      } finally {
-        this.saving = false
-      }
+      this.kitToEdit = kit
+      this.editDialog = true
     },
 
     openDeleteDialog(kit) {
