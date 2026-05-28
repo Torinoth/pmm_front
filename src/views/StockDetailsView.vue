@@ -106,16 +106,19 @@
               >
                 編集
               </v-btn>
-              <v-btn
-                  v-if="authStore.isAuthenticated && statusAction"
-                  :prepend-icon="statusAction.icon"
-                  :color="statusAction.color"
-                  variant="tonal"
-                  :loading="statusChanging"
-                  @click="changeStatus(statusAction.targetStatus)"
-              >
-                {{ statusAction.label }}
-              </v-btn>
+              <template v-if="authStore.isAuthenticated">
+                <v-btn
+                    v-for="action in statusActions"
+                    :key="action.targetStatus"
+                    :prepend-icon="action.icon"
+                    :color="action.color"
+                    variant="tonal"
+                    :loading="statusChanging"
+                    @click="changeStatus(action.targetStatus)"
+                >
+                  {{ action.label }}
+                </v-btn>
+              </template>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -154,13 +157,20 @@ export default {
       if (this.details?.price == null) return ''
       return Number(this.details.price).toLocaleString('ja-JP')
     },
-    statusAction() {
+    statusActions() {
       const map = {
-        backlog:     {label: '制作開始', icon: 'mdi-play',    targetStatus: 'in_progress', color: 'green'},
-        in_progress: {label: '完成',     icon: 'mdi-check',   targetStatus: 'completed',   color: 'teal'},
-        on_hold:     {label: '制作再開', icon: 'mdi-restart', targetStatus: 'in_progress', color: 'green'},
+        backlog: [
+          {label: '制作開始', icon: 'mdi-play',    targetStatus: 'in_progress', color: 'green'},
+        ],
+        in_progress: [
+          {label: '完成', icon: 'mdi-check', targetStatus: 'completed', color: 'teal'},
+          {label: '中断', icon: 'mdi-pause', targetStatus: 'on_hold',   color: 'warning'},
+        ],
+        on_hold: [
+          {label: '制作再開', icon: 'mdi-restart', targetStatus: 'in_progress', color: 'green'},
+        ],
       }
-      return map[this.details?.status] ?? null
+      return map[this.details?.status] ?? []
     },
   },
 
