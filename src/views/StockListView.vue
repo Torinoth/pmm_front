@@ -94,6 +94,16 @@
         {{ statusLabelMap[item.status] }}
       </v-chip>
     </template>
+    <template #[`item.days_since_updated`]="{ item }">
+      <v-chip
+          v-if="item.days_since_updated != null"
+          size="x-small"
+          :color="daysColor(item.days_since_updated)"
+          variant="tonal"
+      >
+        {{ item.days_since_updated }}日
+      </v-chip>
+    </template>
     <template v-if="authStore.isAuthenticated" #[`item.actions`]="{ item }">
       <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditDialog(item)"/>
       <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog(item)"/>
@@ -143,6 +153,7 @@ export default {
         {title: '価格', key: 'price', align: 'end', sortable: false},
         {title: 'タグ', key: 'tags', align: 'start', sortable: false},
         {title: 'ステータス', key: 'status', align: 'start', sortable: false},
+        {title: '放置日数', key: 'days_since_updated', align: 'center', sortable: false, width: '90px'},
       ]
       if (this.authStore.isAuthenticated) {
         base.push({title: '', key: 'actions', align: 'end', sortable: false})
@@ -226,6 +237,12 @@ export default {
       } catch {
         toaster.error('タグの取得に失敗しました')
       }
+    },
+
+    daysColor(days) {
+      if (days < 30) return 'success'
+      if (days < 90) return 'warning'
+      return 'error'
     },
 
     onFilterChange() {
