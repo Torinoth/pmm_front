@@ -153,7 +153,7 @@ export default {
         {title: '価格', key: 'price', align: 'end', sortable: false},
         {title: 'タグ', key: 'tags', align: 'start', sortable: false},
         {title: 'ステータス', key: 'status', align: 'start', sortable: false},
-        {title: '放置日数', key: 'days_since_updated', align: 'center', sortable: false, width: '90px'},
+        {title: '放置日数', key: 'days_since_updated', align: 'center', sortable: true, width: '90px'},
       ]
       if (this.authStore.isAuthenticated) {
         base.push({title: '', key: 'actions', align: 'end', sortable: false})
@@ -219,6 +219,10 @@ export default {
         }
         if (this.selectedStatus) {
           params.status = this.selectedStatus
+        }
+        if (options.sortBy && options.sortBy.length) {
+          const {key, order} = options.sortBy[0]
+          params.ordering = order === 'desc' ? `-${key}` : key
         }
         const res = await kitsApi.list(params)
         this.serverItems = res.data.results ?? res.data
