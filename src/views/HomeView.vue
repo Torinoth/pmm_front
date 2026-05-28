@@ -37,6 +37,10 @@
               <span v-else>{{ summary[card.key] ?? 0 }}</span>
             </div>
             <div class="text-body-1">{{ card.label }}</div>
+            <div class="text-body-2 text-medium-emphasis mt-2">
+              <v-progress-circular v-if="loading" indeterminate size="14"/>
+              <span v-else>¥{{ formatPrice(summary[card.priceKey]) }}</span>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -87,10 +91,10 @@ export default {
     loading: true,
     summary: {},
     summaryCards: [
-      {key: 'total_kits',  label: '総キット数', icon: 'mdi-package-variant-closed', color: 'blue-grey', status: null},
-      {key: 'backlog',     label: '積みプラ',   icon: 'mdi-layers-plus',            color: 'orange',    status: 'backlog'},
-      {key: 'in_progress', label: '製作中',     icon: 'mdi-hammer-wrench',          color: 'green',     status: 'in_progress'},
-      {key: 'completed',   label: '完成',       icon: 'mdi-check-decagram',         color: 'teal',      status: 'completed'},
+      {key: 'total_kits',  priceKey: 'total_price',       label: '総キット数', icon: 'mdi-package-variant-closed', color: 'blue-grey', status: null},
+      {key: 'backlog',     priceKey: 'backlog_price',     label: '積みプラ',   icon: 'mdi-layers-plus',            color: 'orange',    status: 'backlog'},
+      {key: 'in_progress', priceKey: 'in_progress_price', label: '製作中',     icon: 'mdi-hammer-wrench',          color: 'green',     status: 'in_progress'},
+      {key: 'completed',   priceKey: 'completed_price',   label: '完成',       icon: 'mdi-check-decagram',         color: 'teal',      status: 'completed'},
     ],
   }),
 
@@ -99,6 +103,10 @@ export default {
   },
 
   methods: {
+    formatPrice(val) {
+      return (val ?? 0).toLocaleString('ja-JP')
+    },
+
     async loadSummary() {
       this.loading = true
       try {
