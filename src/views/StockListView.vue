@@ -82,6 +82,9 @@
     <template #[`item.name`]="{ item }">
       <router-link :to="`/stock-details/${item.id}`">{{ item.name }}</router-link>
     </template>
+    <template #[`item.price`]="{ item }">
+      ¥{{ formatPrice(item.price) }}
+    </template>
     <template #[`item.image`]="{ item }">
       <v-icon v-if="item.image" color="primary" size="small" title="画像あり">mdi-image</v-icon>
       <v-icon v-else color="grey-lighten-2" size="small" title="画像なし">mdi-image-off</v-icon>
