@@ -55,8 +55,9 @@
     </v-row>
   </v-container>
 
-  <!-- データテーブル -->
+  <!-- PC: データテーブル -->
   <v-data-table-server
+      v-if="!mobile"
       v-model:items-per-page="itemsPerPage"
       :headers="tableHeaders"
       :items="serverItems"
@@ -110,6 +111,104 @@
     </template>
   </v-data-table-server>
 
+  <!-- スマホ: カードビュー -->
+  <v-container v-else fluid class="pt-2">
+    <div v-if="loading" class="d-flex justify-center pa-8">
+      <v-progress-circular indeterminate color="primary"/>
+    </div>
+
+    <template v-else>
+      <div v-if="!serverItems.length" class="text-center text-medium-emphasis pa-8">
+        キットが登録されていません
+      </div>
+
+      <v-card
+          v-for="item in serverItems"
+          :key="item.id"
+          variant="outlined"
+          class="mb-2"
+      >
+        <div class="d-flex">
+          <!-- サムネイル -->
+          <v-img
+              v-if="item.image"
+              :src="item.image"
+              width="88"
+              height="96"
+              cover
+              class="flex-shrink-0 rounded-s"
+          />
+          <div
+              v-else
+              class="d-flex align-center justify-center bg-grey-lighten-3 flex-shrink-0 rounded-s"
+              style="width:88px; height:96px"
+          >
+            <v-icon size="32" color="grey-lighten-1">mdi-package-variant-closed</v-icon>
+          </div>
+
+          <!-- コンテンツ -->
+          <div class="pa-3 flex-1-1" style="min-width:0">
+            <router-link
+                :to="`/stock-details/${item.id}`"
+                class="text-body-2 font-weight-medium text-decoration-none text-primary d-block"
+                style="word-break:break-all"
+            >
+              {{ item.name }}
+            </router-link>
+            <div class="text-caption text-medium-emphasis mt-1">
+              {{ item.maker_name }} · {{ item.scale_size }} · ¥{{ formatPrice(item.price) }}
+            </div>
+            <div class="mt-2 d-flex flex-wrap ga-1">
+              <v-chip
+                  v-if="item.status"
+                  size="x-small"
+                  :color="statusColorMap[item.status]"
+                  variant="tonal"
+              >
+                {{ statusLabelMap[item.status] }}
+              </v-chip>
+              <v-chip
+                  v-if="item.days_since_updated != null"
+                  size="x-small"
+                  :color="daysColor(item.days_since_updated)"
+                  variant="tonal"
+              >
+                {{ item.days_since_updated }}日
+              </v-chip>
+              <v-chip
+                  v-for="tag in item.tags"
+                  :key="tag.id"
+                  size="x-small"
+                  color="primary"
+                  variant="tonal"
+              >
+                {{ tag.name }}
+              </v-chip>
+            </div>
+          </div>
+        </div>
+
+        <!-- 編集・削除ボタン -->
+        <v-card-actions v-if="authStore.isAuthenticated" class="pa-1 pt-0 justify-end">
+          <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditDialog(item)"/>
+          <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog(item)"/>
+        </v-card-actions>
+      </v-card>
+
+      <!-- ページネーション -->
+      <div class="d-flex flex-column align-center py-4">
+        <v-pagination
+            :model-value="currentOptions.page"
+            :length="Math.ceil(totalItems / itemsPerPage) || 1"
+            :total-visible="5"
+            density="comfortable"
+            @update:model-value="page => loadItems({...currentOptions, page})"
+        />
+        <span class="text-caption text-medium-emphasis mt-2">全{{ totalItems }}件</span>
+      </div>
+    </template>
+  </v-container>
+
   <!-- 削除確認ダイアログ -->
   <v-dialog v-model="deleteDialog" max-width="400">
     <v-card>
@@ -134,6 +233,7 @@
 </template>
 
 <script>
+import {useDisplay} from 'vuetify'
 import {mapStores} from 'pinia'
 import {useAuthStore} from '@/stores/auth.js'
 import {kitsApi, tagsApi} from '@/api/index.js'
@@ -142,6 +242,11 @@ import toaster from '@/plugins/Toaster.js'
 
 export default {
   components: {KitEditDialog},
+
+  setup() {
+    const {smAndDown} = useDisplay()
+    return {mobile: smAndDown}
+  },
 
   computed: {
     ...mapStores(useAuthStore),
@@ -208,6 +313,14 @@ export default {
     }
   },
 
+  mounted() {
+    // PC はテーブルの @update:options で初回ロードされるが、
+    // スマホはテーブルが非表示のため mounted でロードする
+    if (this.mobile) {
+      this.loadItems(this.currentOptions)
+    }
+  },
+
   methods: {
     async loadItems(options) {
       this.loading = true
@@ -241,6 +354,10 @@ export default {
       } catch {
         toaster.error('タグの取得に失敗しました')
       }
+    },
+
+    formatPrice(val) {
+      return Number(val).toLocaleString('ja-JP')
     },
 
     daysColor(days) {
