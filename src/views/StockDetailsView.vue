@@ -106,6 +106,16 @@
               >
                 編集
               </v-btn>
+              <v-btn
+                  v-if="authStore.isAuthenticated && statusAction"
+                  :prepend-icon="statusAction.icon"
+                  :color="statusAction.color"
+                  variant="tonal"
+                  :loading="statusChanging"
+                  @click="changeStatus(statusAction.targetStatus)"
+              >
+                {{ statusAction.label }}
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -130,6 +140,7 @@ import {useAuthStore} from '@/stores/auth.js'
 import {kitsApi} from '@/api/index.js'
 import KitEditDialog from '@/components/KitEditDialog.vue'
 import toaster from '@/plugins/Toaster.js'
+import toaster from '@/plugins/Toaster.js'
 
 export default {
   components: {KitEditDialog},
@@ -144,12 +155,21 @@ export default {
       if (this.details?.price == null) return ''
       return Number(this.details.price).toLocaleString('ja-JP')
     },
+    statusAction() {
+      const map = {
+        backlog:     {label: '制作開始', icon: 'mdi-play',    targetStatus: 'in_progress', color: 'green'},
+        in_progress: {label: '完成',     icon: 'mdi-check',   targetStatus: 'completed',   color: 'teal'},
+        on_hold:     {label: '制作再開', icon: 'mdi-restart', targetStatus: 'in_progress', color: 'green'},
+      }
+      return map[this.details?.status] ?? null
+    },
   },
 
   data: () => ({
     details: null,
     loading: true,
     editDialog: false,
+    statusChanging: false,
   }),
 
   created() {
@@ -157,6 +177,21 @@ export default {
   },
 
   methods: {
+    async changeStatus(targetStatus) {
+      this.statusChanging = true
+      try {
+        const formData = new FormData()
+        formData.append('status', targetStatus)
+        await kitsApi.update(this.details.id, formData)
+        await this.fetchKit()
+        toaster.success('ステータスを更新しました')
+      } catch {
+        toaster.error('ステータスの更新に失敗しました')
+      } finally {
+        this.statusChanging = false
+      }
+    },
+
     async fetchKit() {
       this.loading = true
       try {
