@@ -29,7 +29,16 @@
           </v-chip-group>
         </div>
       </v-col>
-      <v-col v-if="authStore.isAuthenticated" cols="auto">
+      <!-- PC: タグフィルターと同行 -->
+      <v-col v-if="authStore.isAuthenticated" cols="auto" class="d-none d-md-flex">
+        <v-btn color="primary" prepend-icon="mdi-plus" @click="openCreateDialog">
+          キット登録
+        </v-btn>
+      </v-col>
+    </v-row>
+    <!-- スマホ: タグとステータスの間に独立行 -->
+    <v-row v-if="authStore.isAuthenticated" justify="end" class="d-md-none mt-0">
+      <v-col cols="auto">
         <v-btn color="primary" prepend-icon="mdi-plus" @click="openCreateDialog">
           キット登録
         </v-btn>
