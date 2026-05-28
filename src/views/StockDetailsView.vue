@@ -140,7 +140,6 @@ import {useAuthStore} from '@/stores/auth.js'
 import {kitsApi} from '@/api/index.js'
 import KitEditDialog from '@/components/KitEditDialog.vue'
 import toaster from '@/plugins/Toaster.js'
-import toaster from '@/plugins/Toaster.js'
 
 export default {
   components: {KitEditDialog},
