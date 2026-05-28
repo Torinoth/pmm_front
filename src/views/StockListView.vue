@@ -12,20 +12,22 @@
       <v-col cols="auto">
         <span class="text-body-2 text-medium-emphasis">タグ：</span>
       </v-col>
-      <v-col>
-        <v-chip-group v-model="selectedTagIds" multiple @update:model-value="onFilterChange">
-          <v-chip
-              v-for="tag in availableTags"
-              :key="tag.id"
-              :value="tag.id"
-              filter
-              variant="outlined"
-              color="primary"
-              size="small"
-          >
-            {{ tag.name }}
-          </v-chip>
-        </v-chip-group>
+      <v-col class="overflow-hidden">
+        <div class="filter-scroll">
+          <v-chip-group v-model="selectedTagIds" multiple @update:model-value="onFilterChange">
+            <v-chip
+                v-for="tag in availableTags"
+                :key="tag.id"
+                :value="tag.id"
+                filter
+                variant="outlined"
+                color="primary"
+                size="small"
+            >
+              {{ tag.name }}
+            </v-chip>
+          </v-chip-group>
+        </div>
       </v-col>
       <v-col v-if="authStore.isAuthenticated" cols="auto">
         <v-btn color="primary" prepend-icon="mdi-plus" @click="openCreateDialog">
@@ -37,20 +39,22 @@
       <v-col cols="auto">
         <span class="text-body-2 text-medium-emphasis">ステータス：</span>
       </v-col>
-      <v-col>
-        <v-chip-group v-model="selectedStatus" @update:model-value="onFilterChange">
-          <v-chip
-              v-for="s in statusOptions"
-              :key="s.value"
-              :value="s.value"
-              filter
-              variant="outlined"
-              :color="s.color"
-              size="small"
-          >
-            {{ s.label }}
-          </v-chip>
-        </v-chip-group>
+      <v-col class="overflow-hidden">
+        <div class="filter-scroll">
+          <v-chip-group v-model="selectedStatus" @update:model-value="onFilterChange">
+            <v-chip
+                v-for="s in statusOptions"
+                :key="s.value"
+                :value="s.value"
+                filter
+                variant="outlined"
+                :color="s.color"
+                size="small"
+            >
+              {{ s.label }}
+            </v-chip>
+          </v-chip-group>
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -400,3 +404,18 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.filter-scroll {
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.filter-scroll::-webkit-scrollbar {
+  display: none; /* Chrome / Safari */
+}
+
+.filter-scroll :deep(.v-slide-group__content) {
+  flex-wrap: nowrap;
+}
+</style>
