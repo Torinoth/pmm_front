@@ -36,12 +36,14 @@ const router = createRouter({
       path: '/stock-list',
       name: 'stock_list',
       component: StockListView,
+      meta: {requiresAuth: true},
     },
     {
       path: '/stock-details/:id',
       name: 'stock_details',
       component: StockDetailsView,
       props: true,
+      meta: {requiresAuth: true},
     },
     {
       path: '/master',

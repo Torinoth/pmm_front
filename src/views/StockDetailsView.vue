@@ -98,7 +98,7 @@
                 一覧に戻る
               </v-btn>
               <v-btn
-                  v-if="authStore.isAuthenticated"
+                  v-if="authStore.isAuthenticated && canEdit"
                   prepend-icon="mdi-pencil"
                   color="primary"
                   variant="tonal"
@@ -106,7 +106,7 @@
               >
                 編集
               </v-btn>
-              <template v-if="authStore.isAuthenticated">
+              <template v-if="authStore.isAuthenticated && canEdit">
                 <v-btn
                     v-for="action in statusActions"
                     :key="action.targetStatus"
@@ -153,6 +153,9 @@ export default {
 
   computed: {
     ...mapStores(useAuthStore),
+    canEdit() {
+      return this.details?.owner_id === this.authStore.user?.id
+    },
     formattedPrice() {
       if (this.details?.price == null) return ''
       return Number(this.details.price).toLocaleString('ja-JP')

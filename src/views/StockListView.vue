@@ -122,8 +122,10 @@
       </v-chip>
     </template>
     <template v-if="authStore.isAuthenticated" #[`item.actions`]="{ item }">
-      <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditDialog(item)"/>
-      <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog(item)"/>
+      <template v-if="canEdit(item)">
+        <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditDialog(item)"/>
+        <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog(item)"/>
+      </template>
     </template>
   </v-data-table-server>
 
@@ -205,7 +207,7 @@
         </div>
 
         <!-- 編集・削除ボタン -->
-        <v-card-actions v-if="authStore.isAuthenticated" class="pa-1 pt-0 justify-end">
+        <v-card-actions v-if="authStore.isAuthenticated && canEdit(item)" class="pa-1 pt-0 justify-end">
           <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditDialog(item)"/>
           <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog(item)"/>
         </v-card-actions>
@@ -380,6 +382,10 @@ export default {
       if (days < 30) return 'success'
       if (days < 90) return 'warning'
       return 'error'
+    },
+
+    canEdit(item) {
+      return item.owner_id === this.authStore.user?.id
     },
 
     onFilterChange() {

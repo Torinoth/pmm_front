@@ -11,7 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const res = await authApi.me()
       if (res.data.isAuthenticated) {
-        user.value = { username: res.data.username }
+        user.value = { id: res.data.id, username: res.data.username }
         isAuthenticated.value = true
         isStaff.value = res.data.isStaff ?? false
       } else {

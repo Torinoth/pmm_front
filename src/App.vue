@@ -46,6 +46,7 @@ async function logout() {
             :to="{ name: 'home' }"
         />
         <v-list-item
+            v-if="auth.isAuthenticated"
             prepend-icon="mdi-format-list-bulleted"
             title="積み状況"
             :to="{ name: 'stock_list' }"
