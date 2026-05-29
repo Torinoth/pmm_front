@@ -55,6 +55,11 @@ function multipartConfig(data) {
   return data instanceof FormData ? {headers: {'Content-Type': undefined}} : {}
 }
 
+export const userApi = {
+  kits: (username, params) => api.get(`/u/${username}/`, {params}),
+  summary: (username) => api.get(`/u/${username}/summary/`),
+}
+
 export const kitsApi = {
   list: (params) => api.get('/kits/', {params}),
   retrieve: (id) => api.get(`/kits/${id}/`),
@@ -74,6 +79,8 @@ export const makersApi = {
   create: (data) => api.post('/makers/', data),
   update: (id, data) => api.put(`/makers/${id}/`, data),
   destroy: (id) => api.delete(`/makers/${id}/`),
+  favorite: (id) => api.post(`/makers/${id}/favorite/`),
+  unfavorite: (id) => api.delete(`/makers/${id}/favorite/`),
 }
 
 export const brandsApi = {
@@ -81,6 +88,8 @@ export const brandsApi = {
   create: (data) => api.post('/brands/', data),
   update: (id, data) => api.put(`/brands/${id}/`, data),
   destroy: (id) => api.delete(`/brands/${id}/`),
+  favorite: (id) => api.post(`/brands/${id}/favorite/`),
+  unfavorite: (id) => api.delete(`/brands/${id}/favorite/`),
 }
 
 export const scalesApi = {

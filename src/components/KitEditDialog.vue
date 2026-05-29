@@ -24,7 +24,21 @@
               :loading="mastersLoading"
               :rules="[v => !!v || '必須項目です']"
               required
-          />
+          >
+            <template #item="{ item, props }">
+              <v-list-item v-bind="props" :subtitle="item.raw.maker_name">
+                <template #prepend>
+                  <v-icon
+                      :icon="item.raw.is_favorite ? 'mdi-star' : 'mdi-star-outline'"
+                      :color="item.raw.is_favorite ? 'amber' : 'grey-lighten-1'"
+                      size="small"
+                      class="mr-2"
+                      @click.stop="toggleBrandFavorite(item.raw)"
+                  />
+                </template>
+              </v-list-item>
+            </template>
+          </v-select>
           <v-select
               v-model="form.scale"
               :items="scales"
@@ -176,6 +190,23 @@ export default {
         toaster.error('マスターデータの取得に失敗しました')
       } finally {
         this.mastersLoading = false
+      }
+    },
+
+    async toggleBrandFavorite(brand) {
+      try {
+        if (brand.is_favorite) {
+          await brandsApi.unfavorite(brand.id)
+          brand.is_favorite = false
+        } else {
+          await brandsApi.favorite(brand.id)
+          brand.is_favorite = true
+        }
+        this.brands.sort((a, b) =>
+          (b.is_favorite ? 1 : 0) - (a.is_favorite ? 1 : 0) || a.name.localeCompare(b.name, 'ja')
+        )
+      } catch {
+        toaster.error('お気に入りの更新に失敗しました')
       }
     },
 

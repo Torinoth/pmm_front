@@ -7,6 +7,7 @@ import LoginView from '@/views/LoginView.vue'
 import MasterView from '@/views/MasterView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import AdminUsersView from '@/views/AdminUsersView.vue'
+import UserStockView from '@/views/UserStockView.vue'
 import {useAuthStore} from '@/stores/auth.js'
 
 const router = createRouter({
@@ -56,6 +57,12 @@ const router = createRouter({
       name: 'admin_users',
       component: AdminUsersView,
       meta: {requiresAuth: true, requiresStaff: true},
+    },
+    {
+      path: '/u/:username',
+      name: 'user_stock',
+      component: UserStockView,
+      props: true,
     },
   ],
 })

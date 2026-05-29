@@ -18,6 +18,16 @@ async function logout() {
   auth.reset()
   router.push({name: 'login'})
 }
+
+async function copyShareUrl() {
+  const url = `${window.location.origin}/u/${auth.user?.username}`
+  try {
+    await navigator.clipboard.writeText(url)
+    toaster.success('URLをコピーしました')
+  } catch {
+    toaster.error('コピーに失敗しました')
+  }
+}
 </script>
 
 <template>
@@ -63,6 +73,15 @@ async function logout() {
             title="ユーザー管理"
             :to="{ name: 'admin_users' }"
         />
+        <template v-if="auth.isAuthenticated">
+          <v-divider class="my-2"/>
+          <v-list-item
+              prepend-icon="mdi-share-variant"
+              title="自分のページを共有"
+              :subtitle="`/u/${auth.user?.username}`"
+              @click="copyShareUrl"
+          />
+        </template>
       </v-list>
     </v-navigation-drawer>
 

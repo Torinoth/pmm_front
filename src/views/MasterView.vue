@@ -30,6 +30,14 @@
             item-value="id"
         >
           <template #[`item.actions`]="{ item }">
+            <v-btn
+                v-if="authStore.isAuthenticated"
+                :icon="item.is_favorite ? 'mdi-star' : 'mdi-star-outline'"
+                :color="item.is_favorite ? 'amber' : 'grey'"
+                size="small"
+                variant="text"
+                @click="toggleFavorite('maker', item)"
+            />
             <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditDialog('maker', item)"/>
             <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog('maker', item)"/>
           </template>
@@ -52,6 +60,14 @@
             item-value="id"
         >
           <template #[`item.actions`]="{ item }">
+            <v-btn
+                v-if="authStore.isAuthenticated"
+                :icon="item.is_favorite ? 'mdi-star' : 'mdi-star-outline'"
+                :color="item.is_favorite ? 'amber' : 'grey'"
+                size="small"
+                variant="text"
+                @click="toggleFavorite('brand', item)"
+            />
             <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditDialog('brand', item)"/>
             <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog('brand', item)"/>
           </template>
@@ -155,6 +171,8 @@
 </template>
 
 <script>
+import {mapStores} from 'pinia'
+import {useAuthStore} from '@/stores/auth.js'
 import {makersApi, brandsApi, scalesApi} from '@/api/index.js'
 import toaster from '@/plugins/Toaster.js'
 
@@ -202,6 +220,7 @@ export default {
   }),
 
   computed: {
+    ...mapStores(useAuthStore),
     dialogTitle() {
       const label = typeLabels[this.dialogType] ?? ''
       return `${label}${this.editedItem?.id ? '編集' : '追加'}`
@@ -228,6 +247,21 @@ export default {
         toaster.error('データの取得に失敗しました')
       } finally {
         this.loading = false
+      }
+    },
+
+    async toggleFavorite(type, item) {
+      const api = type === 'maker' ? makersApi : brandsApi
+      try {
+        if (item.is_favorite) {
+          await api.unfavorite(item.id)
+          item.is_favorite = false
+        } else {
+          await api.favorite(item.id)
+          item.is_favorite = true
+        }
+      } catch {
+        toaster.error('お気に入りの更新に失敗しました')
       }
     },
 
