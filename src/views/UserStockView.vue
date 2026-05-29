@@ -103,7 +103,7 @@
       @update:options="loadItems"
   >
     <template #[`item.name`]="{ item }">
-      <router-link :to="`/stock-details/${item.id}`">{{ item.name }}</router-link>
+      <router-link :to="`/u/${username}/kits/${item.id}`">{{ item.name }}</router-link>
     </template>
     <template #[`item.price`]="{ item }">
       ¥{{ formatPrice(item.price) }}
@@ -182,7 +182,7 @@
 
           <div class="pa-3 flex-1-1" style="min-width:0">
             <router-link
-                :to="`/stock-details/${item.id}`"
+                :to="`/u/${username}/kits/${item.id}`"
                 class="text-body-2 font-weight-medium text-decoration-none text-primary d-block"
                 style="word-break:break-all"
             >

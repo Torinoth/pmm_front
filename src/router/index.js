@@ -8,6 +8,7 @@ import MasterView from '@/views/MasterView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import AdminUsersView from '@/views/AdminUsersView.vue'
 import UserStockView from '@/views/UserStockView.vue'
+import UserKitDetailView from '@/views/UserKitDetailView.vue'
 import VerifyEmailView from '@/views/VerifyEmailView.vue'
 import {useAuthStore} from '@/stores/auth.js'
 
@@ -68,6 +69,12 @@ const router = createRouter({
       path: '/u/:username',
       name: 'user_stock',
       component: UserStockView,
+      props: true,
+    },
+    {
+      path: '/u/:username/kits/:id',
+      name: 'user_kit_detail',
+      component: UserKitDetailView,
       props: true,
     },
   ],

@@ -58,6 +58,7 @@ function multipartConfig(data) {
 
 export const userApi = {
   kits: (username, params) => api.get(`/u/${username}/`, {params}),
+  kit: (username, id) => api.get(`/u/${username}/kits/${id}/`),
   summary: (username) => api.get(`/u/${username}/summary/`),
 }
 
