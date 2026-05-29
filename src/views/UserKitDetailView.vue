@@ -23,7 +23,7 @@
               v-if="details.image"
               :src="details.image"
               :alt="details.name"
-              max-height="300"
+              height="300"
               class="bg-grey-lighten-3 rounded"
           />
           <div
