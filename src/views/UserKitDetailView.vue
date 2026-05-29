@@ -23,14 +23,13 @@
               v-if="details.image"
               :src="details.image"
               :alt="details.name"
-              height="300"
-              cover
+              max-height="300"
               class="bg-grey-lighten-3 rounded"
           />
           <div
               v-else
               class="bg-grey-lighten-3 rounded d-flex align-center justify-center"
-              style="height:300px"
+              style="height:200px"
           >
             <v-icon size="64" color="grey">mdi-image-off</v-icon>
           </div>
