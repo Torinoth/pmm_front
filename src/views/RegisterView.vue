@@ -18,6 +18,14 @@
                   autocomplete="username"
               />
               <v-text-field
+                  v-model="email"
+                  label="メールアドレス"
+                  type="email"
+                  :rules="[v => !!v || '必須項目です', v => /.+@.+\..+/.test(v) || '有効なメールアドレスを入力してください']"
+                  required
+                  autocomplete="email"
+              />
+              <v-text-field
                   v-model="password"
                   label="パスワード（8文字以上）"
                   type="password"
@@ -40,11 +48,11 @@
 
         <!-- 登録完了 -->
         <v-card v-else class="pa-4 text-center">
-          <v-icon icon="mdi-check-circle" size="64" color="success" class="mt-4 mb-2"/>
-          <v-card-title class="text-h6">登録申請を受け付けました</v-card-title>
+          <v-icon icon="mdi-email-check" size="64" color="success" class="mt-4 mb-2"/>
+          <v-card-title class="text-h6">認証メールを送信しました</v-card-title>
           <v-card-text>
-            管理者が承認するまでしばらくお待ちください。<br>
-            承認後にログインできるようになります。
+            ご登録のメールアドレスに認証メールを送信しました。<br>
+            メール内のリンクをクリックして認証を完了してください。
           </v-card-text>
           <v-card-actions class="justify-center pb-4">
             <v-btn color="primary" :to="{name: 'login'}">ログイン画面へ</v-btn>
@@ -61,6 +69,7 @@ import {authApi} from '@/api/index.js'
 
 const formRef = ref(null)
 const username = ref('')
+const email = ref('')
 const password = ref('')
 const loading = ref(false)
 const errorMessage = ref('')
@@ -72,7 +81,7 @@ async function submit() {
   loading.value = true
   errorMessage.value = ''
   try {
-    await authApi.register({username: username.value, password: password.value})
+    await authApi.register({username: username.value, email: email.value, password: password.value})
     registered.value = true
   } catch (e) {
     errorMessage.value = e.response?.data?.detail ?? '登録に失敗しました。もう一度お試しください。'

@@ -8,6 +8,7 @@ import MasterView from '@/views/MasterView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import AdminUsersView from '@/views/AdminUsersView.vue'
 import UserStockView from '@/views/UserStockView.vue'
+import VerifyEmailView from '@/views/VerifyEmailView.vue'
 import {useAuthStore} from '@/stores/auth.js'
 
 const router = createRouter({
@@ -22,6 +23,11 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: RegisterView,
+    },
+    {
+      path: '/verify-email',
+      name: 'verify_email',
+      component: VerifyEmailView,
     },
     {
       path: '/',

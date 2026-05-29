@@ -44,6 +44,7 @@ export const authApi = {
   logout: () => api.post('/auth/logout/'),
   me: () => api.get('/auth/me/'),
   register: (data) => api.post('/auth/register/', data),
+  verifyEmail: (token) => api.get('/auth/verify-email/', {params: {token}}),
   users: () => api.get('/auth/users/'),
   approveUser: (id) => api.post(`/auth/users/${id}/approve/`),
   suspendUser: (id) => api.put(`/auth/users/${id}/suspend/`),
