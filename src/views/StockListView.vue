@@ -344,7 +344,8 @@ export default {
       this.loading = true
       this.currentOptions = options
       try {
-        const params = {page: options.page, page_size: options.itemsPerPage}
+        const pageSize = options.itemsPerPage === -1 ? 1000 : options.itemsPerPage
+        const params = {page: options.page, page_size: pageSize}
         if (this.selectedTagIds.length) {
           params.tags = this.selectedTagIds.join(',')
         }
@@ -354,6 +355,8 @@ export default {
         if (options.sortBy && options.sortBy.length) {
           const {key, order} = options.sortBy[0]
           params.ordering = order === 'desc' ? `-${key}` : key
+        } else {
+          params.ordering = '-id'
         }
         const res = await kitsApi.list(params)
         this.serverItems = res.data.results ?? res.data
