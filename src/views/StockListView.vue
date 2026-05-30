@@ -72,6 +72,7 @@
   <v-data-table-server
       v-if="!mobile"
       v-model:items-per-page="itemsPerPage"
+      v-model:sort-by="tableSortBy"
       :headers="tableHeaders"
       :items="serverItems"
       :items-length="totalItems"
@@ -287,10 +288,11 @@ export default {
 
   data: () => ({
     itemsPerPage: 10,
+    tableSortBy: [],
     serverItems: [],
     loading: true,
     totalItems: 0,
-    currentOptions: {page: 1, itemsPerPage: 10},
+    currentOptions: {page: 1, itemsPerPage: 10, sortBy: []},
 
     availableTags: [],
     selectedTagIds: [],
@@ -335,7 +337,7 @@ export default {
     // PC はテーブルの @update:options で初回ロードされるが、
     // スマホはテーブルが非表示のため mounted でロードする
     if (this.mobile) {
-      this.loadItems(this.currentOptions)
+      this.loadItems({...this.currentOptions, sortBy: []})
     }
   },
 
