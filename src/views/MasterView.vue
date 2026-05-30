@@ -18,7 +18,7 @@
       <v-window-item value="makers">
         <v-row justify="end" class="mb-2">
           <v-col cols="auto">
-            <v-btn color="primary" prepend-icon="mdi-plus" @click="openCreateDialog('maker')">
+            <v-btn v-if="authStore.isAuthenticated" color="primary" prepend-icon="mdi-plus" @click="openCreateDialog('maker')">
               メーカー追加
             </v-btn>
           </v-col>
@@ -38,8 +38,8 @@
                 variant="text"
                 @click="toggleFavorite('maker', item)"
             />
-            <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditDialog('maker', item)"/>
-            <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog('maker', item)"/>
+            <v-btn v-if="authStore.isStaff" icon="mdi-pencil" size="small" variant="text" @click="openEditDialog('maker', item)"/>
+            <v-btn v-if="authStore.isStaff" icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog('maker', item)"/>
           </template>
         </v-data-table>
       </v-window-item>
@@ -48,7 +48,7 @@
       <v-window-item value="brands">
         <v-row justify="end" class="mb-2">
           <v-col cols="auto">
-            <v-btn color="primary" prepend-icon="mdi-plus" @click="openCreateDialog('brand')">
+            <v-btn v-if="authStore.isAuthenticated" color="primary" prepend-icon="mdi-plus" @click="openCreateDialog('brand')">
               ブランド追加
             </v-btn>
           </v-col>
@@ -68,8 +68,8 @@
                 variant="text"
                 @click="toggleFavorite('brand', item)"
             />
-            <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditDialog('brand', item)"/>
-            <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog('brand', item)"/>
+            <v-btn v-if="authStore.isStaff" icon="mdi-pencil" size="small" variant="text" @click="openEditDialog('brand', item)"/>
+            <v-btn v-if="authStore.isStaff" icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog('brand', item)"/>
           </template>
         </v-data-table>
       </v-window-item>
@@ -78,7 +78,7 @@
       <v-window-item value="scales">
         <v-row justify="end" class="mb-2">
           <v-col cols="auto">
-            <v-btn color="primary" prepend-icon="mdi-plus" @click="openCreateDialog('scale')">
+            <v-btn v-if="authStore.isAuthenticated" color="primary" prepend-icon="mdi-plus" @click="openCreateDialog('scale')">
               スケール追加
             </v-btn>
           </v-col>
@@ -90,8 +90,8 @@
             item-value="id"
         >
           <template #[`item.actions`]="{ item }">
-            <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditDialog('scale', item)"/>
-            <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog('scale', item)"/>
+            <v-btn v-if="authStore.isStaff" icon="mdi-pencil" size="small" variant="text" @click="openEditDialog('scale', item)"/>
+            <v-btn v-if="authStore.isStaff" icon="mdi-delete" size="small" variant="text" color="error" @click="openDeleteDialog('scale', item)"/>
           </template>
         </v-data-table>
       </v-window-item>
@@ -193,6 +193,7 @@ export default {
     makers: [],
     makerHeaders: [
       {title: 'メーカー名', key: 'name', align: 'start'},
+      {title: '使用数', key: 'kit_count', align: 'end'},
       {title: '', key: 'actions', align: 'end', sortable: false},
     ],
 
@@ -200,12 +201,14 @@ export default {
     brandHeaders: [
       {title: 'ブランド名', key: 'name', align: 'start'},
       {title: 'メーカー', key: 'maker_name', align: 'start'},
+      {title: '使用数', key: 'kit_count', align: 'end'},
       {title: '', key: 'actions', align: 'end', sortable: false},
     ],
 
     scales: [],
     scaleHeaders: [
       {title: 'スケール', key: 'size', align: 'start'},
+      {title: '使用数', key: 'kit_count', align: 'end'},
       {title: '', key: 'actions', align: 'end', sortable: false},
     ],
 
