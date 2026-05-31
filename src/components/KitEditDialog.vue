@@ -8,6 +8,19 @@
     <v-card>
       <v-card-title>{{ form.id ? 'キット編集' : 'キット登録' }}</v-card-title>
       <v-card-text>
+        <!-- バーコードスキャンボタン -->
+        <v-btn
+            prepend-icon="mdi-barcode-scan"
+            variant="tonal"
+            size="small"
+            color="primary"
+            :loading="scanLoading"
+            class="mb-4"
+            @click="openScanDialog"
+        >
+          バーコードをスキャン
+        </v-btn>
+
         <v-form ref="formRef">
           <v-text-field
               v-model="form.name"
@@ -96,10 +109,36 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- カメラスキャンダイアログ -->
+  <v-dialog v-model="scanning" max-width="400" persistent @after-enter="startScanning">
+    <v-card>
+      <v-card-title class="text-body-1">
+        <v-icon class="mr-2">mdi-barcode-scan</v-icon>
+        バーコードをスキャン
+      </v-card-title>
+      <v-card-text class="pa-2">
+        <video
+            ref="scanVideo"
+            style="width:100%;border-radius:4px;background:#000;display:block"
+            playsinline
+            muted
+        />
+        <p class="text-caption text-center text-medium-emphasis mt-2">
+          バーコードをカメラに向けてください
+        </p>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer/>
+        <v-btn variant="text" @click="stopScan">キャンセル</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
-import {kitsApi, brandsApi, scalesApi} from '@/api/index.js'
+import {BrowserMultiFormatReader} from '@zxing/library'
+import {kitsApi, brandsApi, scalesApi, searchApi} from '@/api/index.js'
 import TagInput from '@/components/TagInput.vue'
 import toaster from '@/plugins/Toaster.js'
 
@@ -147,6 +186,9 @@ export default {
       {value: 'sold',        label: '売却済み'},
       {value: 'parted_out',  label: '素材化'},
     ],
+    scanning: false,
+    scanLoading: false,
+    codeReader: null,
   }),
 
   watch: {
@@ -210,7 +252,57 @@ export default {
       }
     },
 
+    openScanDialog() {
+      this.scanning = true
+    },
+
+    async startScanning() {
+      try {
+        this.codeReader = new BrowserMultiFormatReader()
+        await this.codeReader.decodeFromConstraints(
+          {video: {facingMode: {ideal: 'environment'}}},
+          this.$refs.scanVideo,
+          async (result, error) => {
+            if (!result) return
+            this.stopScan()
+            await this.fetchByBarcode(result.getText())
+          },
+        )
+      } catch {
+        toaster.error('カメラの起動に失敗しました。カメラへのアクセスを許可してください。')
+        this.stopScan()
+      }
+    },
+
+    stopScan() {
+      if (this.codeReader) {
+        this.codeReader.reset()
+        this.codeReader = null
+      }
+      this.scanning = false
+    },
+
+    async fetchByBarcode(jan) {
+      this.scanLoading = true
+      try {
+        const res = await searchApi.barcode(jan)
+        const {name, price} = res.data
+        if (name) this.form.name = name
+        if (price) this.form.price = price
+        toaster.success(`「${name}」の情報を取得しました`)
+      } catch (e) {
+        if (e.response?.status === 404) {
+          toaster.error('商品が見つかりませんでした（JANコード: ' + jan + '）')
+        } else {
+          toaster.error('商品情報の取得に失敗しました')
+        }
+      } finally {
+        this.scanLoading = false
+      }
+    },
+
     close() {
+      this.stopScan()
       this.$emit('update:modelValue', false)
     },
 

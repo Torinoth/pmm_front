@@ -101,4 +101,8 @@ export const scalesApi = {
   destroy: (id) => api.delete(`/scales/${id}/`),
 }
 
+export const searchApi = {
+  barcode: (jan) => api.get('/search/barcode/', {params: {jan}}),
+}
+
 export default api
