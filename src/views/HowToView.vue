@@ -163,8 +163,23 @@
               </tr>
             </tbody>
           </v-table>
-          <v-alert type="info" variant="tonal" density="compact">
+          <v-alert type="info" variant="tonal" density="compact" class="mb-4">
             ブランドやスケールが一覧にない場合は、マスタ管理ページから追加できます（ログイン必須）。
+          </v-alert>
+
+          <p class="text-subtitle-2 mb-2">
+            <v-icon size="small" color="primary" class="mr-1">mdi-barcode-scan</v-icon>
+            バーコードスキャンで自動入力
+          </p>
+          <p class="text-body-2 text-medium-emphasis mb-3">
+            登録ダイアログ上部の「バーコードをスキャン」ボタンをタップすると、
+            スマホのカメラが起動します。プラモデルの箱に印刷されたバーコード（JANコード）を
+            カメラに向けるだけで、商品名と価格が自動入力されます。
+          </p>
+          <v-alert type="warning" variant="tonal" density="compact" icon="mdi-alert-outline">
+            商品データはYahoo!ショッピングの情報を使用しているため、商品名に
+            「【8月再生産】」「[限定版]」などの販売情報が含まれる場合があります。
+            その場合は手動で商品名を修正してください。
           </v-alert>
         </v-card-text>
       </v-card>
