@@ -37,7 +37,7 @@ async function copyShareUrl() {
         <v-app-bar-nav-icon @click="drawer = !drawer"/>
       </template>
 
-      <v-app-bar-title>すこん部員のなにがし</v-app-bar-title>
+      <v-app-bar-title>積みログ</v-app-bar-title>
 
       <template v-slot:append>
         <template v-if="auth.isAuthenticated">

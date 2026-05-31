@@ -3,7 +3,8 @@
     <v-row align="center" justify="center">
       <v-col cols="12" sm="8" md="4">
         <v-card>
-          <v-card-title class="text-h5 pa-4">ログイン</v-card-title>
+          <v-card-title class="text-h5 pa-4 pb-1">積みログ</v-card-title>
+          <v-card-subtitle class="px-4 pb-3">ログイン</v-card-subtitle>
           <v-card-text>
             <v-form ref="formRef" @submit.prevent="submit">
               <v-text-field

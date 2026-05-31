@@ -4,7 +4,8 @@
       <v-col cols="12" sm="8" md="4">
         <!-- 登録フォーム -->
         <v-card v-if="!registered">
-          <v-card-title class="text-h5 pa-4">新規登録</v-card-title>
+          <v-card-title class="text-h5 pa-4 pb-1">積みログ</v-card-title>
+          <v-card-subtitle class="px-4 pb-3">新規登録</v-card-subtitle>
           <v-card-text>
             <v-alert v-if="errorMessage" type="error" class="mb-4" density="compact">
               {{ errorMessage }}
