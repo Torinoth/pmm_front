@@ -56,6 +56,11 @@ async function copyShareUrl() {
             :to="{ name: 'home' }"
         />
         <v-list-item
+            prepend-icon="mdi-help-circle-outline"
+            title="使い方"
+            :to="{ name: 'howto' }"
+        />
+        <v-list-item
             v-if="auth.isAuthenticated"
             prepend-icon="mdi-format-list-bulleted"
             title="積み状況"

@@ -10,6 +10,7 @@ import AdminUsersView from '@/views/AdminUsersView.vue'
 import UserStockView from '@/views/UserStockView.vue'
 import UserKitDetailView from '@/views/UserKitDetailView.vue'
 import VerifyEmailView from '@/views/VerifyEmailView.vue'
+import HowToView from '@/views/HowToView.vue'
 import {useAuthStore} from '@/stores/auth.js'
 
 const router = createRouter({
@@ -39,6 +40,11 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: AboutView,
+    },
+    {
+      path: '/howto',
+      name: 'howto',
+      component: HowToView,
     },
     {
       path: '/stock-list',
